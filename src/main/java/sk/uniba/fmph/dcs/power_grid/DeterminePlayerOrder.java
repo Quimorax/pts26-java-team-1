@@ -7,9 +7,9 @@ import java.util.Random;
 import java.util.ArrayList;
 import java.util.Comparator;
 public final class DeterminePlayerOrder {
-    private final TownsInterface towns;
-    private final Map<PlayerColor, PlayerBoardInterface> players;
-    public DeterminePlayerOrder(final TownsInterface towns, final Map<PlayerColor, PlayerBoardInterface> players) {
+    private final TownsPort towns;
+    private final Map<PlayerColor, PlayerBoardPort> players;
+    public DeterminePlayerOrder(final TownsPort towns, final Map<PlayerColor, PlayerBoardPort> players) {
         this.towns = towns;
         this.players = new EnumMap<>(players);
     }

@@ -4,10 +4,11 @@ import org.junit.Test;
 import java.util.List;
 import java.util.Map;
 import java.util.EnumMap;
+import java.util.Optional;
 import java.util.Random;
 
 import static org.junit.Assert.*;
-final class TownsFake implements TownsInterface {
+final class TownsFake implements TownsPort {
     private final Map<PlayerColor, Integer> houses;
     TownsFake(Map<PlayerColor, Integer> houses) {
         this.houses = Map.copyOf(houses);
@@ -19,23 +20,65 @@ final class TownsFake implements TownsInterface {
     public int getNumberOfHouses(PlayerColor player) {
         return houses.getOrDefault(player, 0);
     }
+    @Override
+    public int getMaxNumberOfHouses(){
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+    @Override
+    public void startStep2(){
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+    @Override
+    public void startStep3(){
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+    @Override
+    public Variant<Integer, RequestError> buyHouses(PlayerColor player, List<String> townNames, int maxMoney){
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }
 
-final class PlayerBoardFake implements PlayerBoardInterface {
+final class PlayerBoardFake implements PlayerBoardPort {
     private final PowerPlantNumber bestPlant;
     private final int money;
     private final int connectableCities;
-    PlayerBoardFake() {
-        this.bestPlant=new PowerPlantNumber(0);
-        this.money=0;
-        this.connectableCities=0;
-    }
     PlayerBoardFake(int bestPlant, int money, int connectableCities) {
         this.bestPlant = new PowerPlantNumber(bestPlant);
         this.money = money;
         this.connectableCities = connectableCities;
     }
-
+    @Override
+    public boolean hasEnoughMoney(int amount){
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+    @Override
+    public boolean receivePowerPlant(PowerPlant plant, int price){
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+    @Override
+    public Optional<RequestError> removePowerPlant(PowerPlantNumber number, List<Resource> removedResources){
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+    @Override
+    public Optional<RequestError> buyResources(List<Resource> resources){
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+    @Override
+    public Variant<Integer, RequestError> usePowerPlants(List<PowerPlantNumber> numbers, List<Resource> resourcesToBurn){
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+    @Override
+    public void receiveMoney(int numberOfTowns){
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+    @Override
+    public void spendMoney(int amount){
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+    @Override
+    public String state(){
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
     @Override
     public PowerPlantNumber bestPowerPlantNumber() {
         return bestPlant;
@@ -55,10 +98,10 @@ final class PlayerBoardFake implements PlayerBoardInterface {
 public class DeterminePlayerOrderTest {
     @Test
     public void testInitialOrderDeterministicWithSeed() {
-        TownsInterface towns = new TownsFake();
-        Map<PlayerColor, PlayerBoardInterface> players = new EnumMap<>(PlayerColor.class);
+        TownsPort towns = new TownsFake();
+        Map<PlayerColor, PlayerBoardPort> players = new EnumMap<>(PlayerColor.class);
         for(PlayerColor color : PlayerColor.values()) {
-            players.put(color, new PlayerBoardFake());
+            players.put(color, new PlayerBoardFake(1,0,0));
         }
         DeterminePlayerOrder order=new DeterminePlayerOrder(towns,players);
         List<PlayerColor> first = order.initialOrder(new Random(42));
@@ -68,12 +111,12 @@ public class DeterminePlayerOrderTest {
     }
     @Test
     public void testReorder() {
-        TownsInterface towns = new TownsFake(Map.of(
+        TownsPort towns = new TownsFake(Map.of(
                 PlayerColor.RED, 5,
                 PlayerColor.BLUE, 3,
                 PlayerColor.GREEN, 5
         ));
-        EnumMap<PlayerColor, PlayerBoardInterface> players = new EnumMap<>(PlayerColor.class);
+        EnumMap<PlayerColor, PlayerBoardPort> players = new EnumMap<>(PlayerColor.class);
         players.put(PlayerColor.RED, new PlayerBoardFake(30, 100, 5));
         players.put(PlayerColor.BLUE, new PlayerBoardFake(25, 80, 8));
         players.put(PlayerColor.GREEN, new PlayerBoardFake(20, 120, 7));
@@ -86,12 +129,12 @@ public class DeterminePlayerOrderTest {
     }
     @Test
     public void testGameResult() {
-        TownsInterface towns = new TownsFake(Map.of(
+        TownsPort towns = new TownsFake(Map.of(
                 PlayerColor.RED, 10,
                 PlayerColor.BLUE, 8,
                 PlayerColor.GREEN, 7
         ));
-        EnumMap<PlayerColor, PlayerBoardInterface> players = new EnumMap<>(PlayerColor.class);
+        EnumMap<PlayerColor, PlayerBoardPort> players = new EnumMap<>(PlayerColor.class);
         players.put(PlayerColor.RED, new PlayerBoardFake(30, 100, 7));
         players.put(PlayerColor.BLUE, new PlayerBoardFake(25, 80, 8));
         players.put(PlayerColor.GREEN, new PlayerBoardFake(20, 120, 7));

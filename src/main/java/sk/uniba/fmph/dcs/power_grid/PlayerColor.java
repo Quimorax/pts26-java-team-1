@@ -2,9 +2,9 @@ package sk.uniba.fmph.dcs.power_grid;
 
 public enum PlayerColor {
     RED,
-    BLUE,
     YELLOW,
+    BLUE,
+    GREEN,
     PURPLE,
-    BLACK,
-    GREEN
+    BLACK
 }
