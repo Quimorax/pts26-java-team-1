@@ -39,6 +39,30 @@ public final class PowerGridGameAdapter {
         return createResponse(error);
     }
 
+    public Variant<SerializedGameState, RequestError> bidForCurrentPowerPlant(final int playerId, final int bid) {
+        PlayerColor player = players.get(playerId);
+
+        if (player == null) {
+            return Variant.failure(new RequestError("Unknown player."));
+        }
+
+        Optional<RequestError> error = controller.bidForCurrentPowerPlant(player, bid);
+
+        return createResponse(error);
+    }
+
+    public Variant<SerializedGameState, RequestError> doNotBidForCurrentPowerPlant(final int playerId) {
+        PlayerColor player = players.get(playerId);
+
+        if (player == null) {
+            return Variant.failure(new RequestError("Unknown player."));
+        }
+
+        Optional<RequestError> error = controller.doNotBidForCurrentPowerPlant(player);
+
+        return createResponse(error);
+    }
+
     private Variant<SerializedGameState, RequestError> createResponse(final Optional<RequestError> error) {
         if (error.isPresent()) {
             return Variant.failure(error.get());
