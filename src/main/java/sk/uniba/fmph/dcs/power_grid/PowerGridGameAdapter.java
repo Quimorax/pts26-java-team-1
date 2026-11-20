@@ -79,6 +79,25 @@ public final class PowerGridGameAdapter {
         return createResponse(controller.buyResources(player, parsed.get()));
     }
 
+    public Variant<SerializedGameState, RequestError> removePowerPlant(final int playerId, final int powerPlantNumber, final String removedResources) {
+        PlayerColor player = players.get(playerId);
+        if (player == null) {
+            return Variant.failure(new RequestError("Unknown player."));
+        }
+
+        if (powerPlantNumber < 1) {
+            return Variant.failure(new RequestError("A power plant number must be positive."));
+        }
+
+        Optional<List<Resource>> parsed = parseResources(removedResources);
+        if (parsed.isEmpty()) {
+            return Variant.failure(new RequestError("Invalid resource string."));
+        }
+
+        PowerPlantNumber number = new PowerPlantNumber(powerPlantNumber);
+        return createResponse(controller.removePowerPlant(player, number, parsed.get()));
+    }
+
     private Optional<List<Resource>> parseResources(final String resources) {
         if (resources == null) {
             return Optional.empty();

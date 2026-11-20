@@ -85,7 +85,12 @@ public final class GameControllerStub implements GameControllerPort {
 
     @Override
     public Optional<RequestError> removePowerPlant(final PlayerColor player, final PowerPlantNumber number, final List<Resource> removedResources) {
-        throw new UnsupportedOperationException();
+        receivedPlayer = player;
+        receivedNumber = number;
+        receivedResources = List.copyOf(removedResources);
+        lastAction = "removePowerPlant";
+        callCount++;
+        return error;
     }
 
     @Override

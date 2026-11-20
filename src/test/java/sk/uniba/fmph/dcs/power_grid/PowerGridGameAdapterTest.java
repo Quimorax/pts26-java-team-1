@@ -220,6 +220,46 @@ public class PowerGridGameAdapterTest {
         assertEquals(1, controller.callCount());
         assertEquals(Variant.success(new SerializedGameState("test state")), result);
     }
+
+    @Test
+    public void passesPlantAndRemovedResourcesToController() {
+        GameControllerStub controller = new GameControllerStub();
+        PowerGridGameAdapter adapter = new PowerGridGameAdapter(
+                controller, Map.of(42, PlayerColor.GREEN));
+
+        Variant<SerializedGameState, RequestError> result =
+                adapter.removePowerPlant(42, 7, "CO");
+
+        assertEquals("removePowerPlant", controller.lastAction());
+        assertEquals(PlayerColor.GREEN, controller.receivedPlayer());
+        assertEquals(new PowerPlantNumber(7), controller.receivedNumber());
+        assertEquals(List.of(Resource.COAL, Resource.OIL), controller.receivedResources());
+        assertEquals(1, controller.callCount());
+        assertEquals(Variant.success(new SerializedGameState("test state")), result);
+    }
+
+    @Test
+    public void rejectsInvalidPlantNumberBeforeRemoval() {
+        GameControllerStub controller = new GameControllerStub();
+        PowerGridGameAdapter adapter = new PowerGridGameAdapter(controller, Map.of(42, PlayerColor.GREEN));
+
+        Variant<SerializedGameState, RequestError> result = adapter.removePowerPlant(42, 0, "C");
+
+        assertEquals(Variant.failure(new RequestError("A power plant number must be positive.")), result);
+        assertEquals(0, controller.callCount());
+    }
+
+    @Test
+    public void rejectsInvalidResourcesBeforeRemovingPlant() {
+        GameControllerStub controller = new GameControllerStub();
+        PowerGridGameAdapter adapter = new PowerGridGameAdapter(controller, Map.of(42, PlayerColor.GREEN));
+
+        Variant<SerializedGameState, RequestError> result = adapter.removePowerPlant(42, 7, "CX");
+
+        assertEquals(Variant.failure(new RequestError("Invalid resource string.")), result);
+        assertEquals(0, controller.callCount());
+    }
+
 }
 
 
