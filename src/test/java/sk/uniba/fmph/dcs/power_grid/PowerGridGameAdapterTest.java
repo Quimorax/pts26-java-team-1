@@ -299,6 +299,57 @@ public class PowerGridGameAdapterTest {
         assertEquals(0, controller.callCount());
     }
 
+    @Test
+    public void passesPlantNumbersAndFuelToController() {
+        GameControllerStub controller = new GameControllerStub();
+        PowerGridRulesGameInterface adapter = new PowerGridGameAdapter(controller, Map.of(42, PlayerColor.YELLOW));
+
+        Variant<SerializedGameState, RequestError> result = adapter.usePowerPlants(42, List.of(7, 12), "CCO");
+
+        assertEquals("usePowerPlants", controller.lastAction());
+        assertEquals(PlayerColor.YELLOW, controller.receivedPlayer());
+        assertEquals(List.of(new PowerPlantNumber(7), new PowerPlantNumber(12)), controller.receivedNumbers());
+        assertEquals(List.of(Resource.COAL, Resource.COAL, Resource.OIL), controller.receivedResources());
+        assertEquals(1, controller.callCount());
+        assertEquals(Variant.success(new SerializedGameState("test state")), result);
+    }
+
+    @Test
+    public void rejectsInvalidNumberBeforeUsingAnyPlant() {
+        GameControllerStub controller = new GameControllerStub();
+        PowerGridGameAdapter adapter = new PowerGridGameAdapter(controller, Map.of(42, PlayerColor.YELLOW));
+
+        Variant<SerializedGameState, RequestError> result = adapter.usePowerPlants(42, List.of(7, 0), "C");
+
+        assertEquals(Variant.failure(new RequestError("A power plant number must be positive.")), result);
+        assertEquals(0, controller.callCount());
+    }
+
+    @Test
+    public void rejectsInvalidFuelBeforeUsingAnyPlant() {
+        GameControllerStub controller = new GameControllerStub();
+        PowerGridGameAdapter adapter = new PowerGridGameAdapter(controller, Map.of(42, PlayerColor.YELLOW));
+
+        Variant<SerializedGameState, RequestError> result = adapter.usePowerPlants(42, List.of(7, 12), "CX");
+
+        assertEquals(Variant.failure(new RequestError("Invalid resource string.")), result);
+        assertEquals(0, controller.callCount());
+    }
+
+    @Test
+    public void passesSelectedPlantWithEmptyFuelList() {
+        GameControllerStub controller = new GameControllerStub();
+        PowerGridRulesGameInterface adapter = new PowerGridGameAdapter(controller, Map.of(42, PlayerColor.GREEN));
+
+        Variant<SerializedGameState, RequestError> result = adapter.usePowerPlants(42, List.of(13), "");
+
+        assertEquals("usePowerPlants", controller.lastAction());
+        assertEquals(List.of(new PowerPlantNumber(13)), controller.receivedNumbers());
+        assertEquals(List.of(), controller.receivedResources());
+        assertEquals(1, controller.callCount());
+        assertEquals(Variant.success(new SerializedGameState("test state")), result);
+    }
+
 }
 
 

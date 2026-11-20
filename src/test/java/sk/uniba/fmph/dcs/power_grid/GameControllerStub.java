@@ -7,6 +7,7 @@ public final class GameControllerStub implements GameControllerPort {
     private PlayerColor receivedPlayer;
     private int callCount;
     private PowerPlantNumber receivedNumber;
+    private List<PowerPlantNumber> receivedNumbers;
     private int receivedFirstBid;
     private int receivedBid;
     private List<Resource> receivedResources;
@@ -27,6 +28,10 @@ public final class GameControllerStub implements GameControllerPort {
 
     public PowerPlantNumber receivedNumber() {
         return receivedNumber;
+    }
+
+    public List<PowerPlantNumber> receivedNumbers() {
+        return receivedNumbers;
     }
 
     public int receivedFirstBid() {
@@ -118,7 +123,12 @@ public final class GameControllerStub implements GameControllerPort {
 
     @Override
     public Optional<RequestError> usePowerPlants(final PlayerColor player, final List<PowerPlantNumber> numbers, final List<Resource> resourcesToBurn) {
-        throw new UnsupportedOperationException();
+        receivedPlayer = player;
+        receivedNumbers = List.copyOf(numbers);
+        receivedResources = List.copyOf(resourcesToBurn);
+        lastAction = "usePowerPlants";
+        callCount++;
+        return error;
     }
 }
 
