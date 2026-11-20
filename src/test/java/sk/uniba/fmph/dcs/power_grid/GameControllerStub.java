@@ -6,6 +6,8 @@ public final class GameControllerStub implements GameControllerPort {
     private Optional<RequestError> error = Optional.empty();
     private PlayerColor receivedPlayer;
     private int callCount;
+    private PowerPlantNumber receivedNumber;
+    private int receivedFirstBid;
 
     public void setError(final RequestError error) {
         this.error = Optional.of(error);
@@ -17,6 +19,14 @@ public final class GameControllerStub implements GameControllerPort {
 
     public int callCount() {
         return callCount;
+    }
+
+    public PowerPlantNumber receivedNumber() {
+        return receivedNumber;
+    }
+
+    public int receivedFirstBid() {
+        return receivedFirstBid;
     }
 
     @Override
@@ -33,7 +43,11 @@ public final class GameControllerStub implements GameControllerPort {
 
     @Override
     public Optional<RequestError> selectPowerPlantToBid(final PlayerColor player, final PowerPlantNumber number, final int firstBid) {
-        throw new UnsupportedOperationException();
+        receivedPlayer = player;
+        receivedNumber = number;
+        receivedFirstBid = firstBid;
+        callCount++;
+        return error;
     }
 
     @Override
@@ -66,4 +80,5 @@ public final class GameControllerStub implements GameControllerPort {
         throw new UnsupportedOperationException();
     }
 }
+
 

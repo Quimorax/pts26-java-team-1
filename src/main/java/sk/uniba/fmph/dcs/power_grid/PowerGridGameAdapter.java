@@ -23,6 +23,22 @@ public final class PowerGridGameAdapter {
         return createResponse(error);
     }
 
+    public Variant<SerializedGameState, RequestError> selectPowerPlantToBid(final int playerId, final int powerPlantNumber, final int firstBid) {
+        PlayerColor player = players.get(playerId);
+
+        if (player == null) {
+            return Variant.failure(new RequestError("Unknown player."));
+        }
+
+        if (powerPlantNumber < 1) {
+            return Variant.failure(new RequestError("A power plant number must be positive."));
+        }
+
+        PowerPlantNumber number = new PowerPlantNumber(powerPlantNumber);
+        Optional<RequestError> error = controller.selectPowerPlantToBid(player, number, firstBid);
+        return createResponse(error);
+    }
+
     private Variant<SerializedGameState, RequestError> createResponse(final Optional<RequestError> error) {
         if (error.isPresent()) {
             return Variant.failure(error.get());
