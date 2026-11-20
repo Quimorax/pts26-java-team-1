@@ -10,6 +10,7 @@ public final class GameControllerStub implements GameControllerPort {
     private int receivedFirstBid;
     private int receivedBid;
     private List<Resource> receivedResources;
+    private List<String> receivedTownNames;
     private String lastAction;
 
     public void setError(final RequestError error) {
@@ -38,6 +39,10 @@ public final class GameControllerStub implements GameControllerPort {
 
     public List<Resource> receivedResources() {
         return receivedResources;
+    }
+
+    public List<String> receivedTownNames() {
+        return receivedTownNames;
     }
 
     public String lastAction() {
@@ -104,7 +109,11 @@ public final class GameControllerStub implements GameControllerPort {
 
     @Override
     public Optional<RequestError> buyHouses(final PlayerColor player, final List<String> townNames) {
-        throw new UnsupportedOperationException();
+        receivedPlayer = player;
+        receivedTownNames = List.copyOf(townNames);
+        lastAction = "buyHouses";
+        callCount++;
+        return error;
     }
 
     @Override

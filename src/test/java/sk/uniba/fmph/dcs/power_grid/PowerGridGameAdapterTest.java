@@ -260,6 +260,45 @@ public class PowerGridGameAdapterTest {
         assertEquals(0, controller.callCount());
     }
 
+    @Test
+    public void passesTownNamesToController() {
+        GameControllerStub controller = new GameControllerStub();
+        PowerGridGameAdapter adapter = new PowerGridGameAdapter(controller, Map.of(42, PlayerColor.BLACK));
+        List<String> towns = List.of("Berlin", "Hamburg");
+
+        Variant<SerializedGameState, RequestError> result = adapter.buyHouses(42, towns);
+
+        assertEquals("buyHouses", controller.lastAction());
+        assertEquals(PlayerColor.BLACK, controller.receivedPlayer());
+        assertEquals(towns, controller.receivedTownNames());
+        assertEquals(1, controller.callCount());
+        assertEquals(Variant.success(new SerializedGameState("test state")), result);
+    }
+
+    @Test
+    public void passesEmptyTownListToController() {
+        GameControllerStub controller = new GameControllerStub();
+        PowerGridGameAdapter adapter = new PowerGridGameAdapter(controller, Map.of(42, PlayerColor.BLACK));
+
+        Variant<SerializedGameState, RequestError> result = adapter.buyHouses(42, List.of());
+
+        assertEquals(List.of(), controller.receivedTownNames());
+        assertEquals(1, controller.callCount());
+        assertEquals(Variant.success(new SerializedGameState("test state")), result);
+    }
+
+    @Test
+    public void rejectsMissingTownNameBeforeBuyingHouses() {
+        GameControllerStub controller = new GameControllerStub();
+        PowerGridGameAdapter adapter = new PowerGridGameAdapter(controller, Map.of(42, PlayerColor.BLACK));
+        List<String> towns = java.util.Arrays.asList("Berlin", null);
+
+        Variant<SerializedGameState, RequestError> result = adapter.buyHouses(42, towns);
+
+        assertEquals(Variant.failure(new RequestError("Town name is missing.")), result);
+        assertEquals(0, controller.callCount());
+    }
+
 }
 
 

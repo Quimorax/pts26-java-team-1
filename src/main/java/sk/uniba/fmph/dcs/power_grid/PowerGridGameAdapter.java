@@ -98,6 +98,25 @@ public final class PowerGridGameAdapter {
         return createResponse(controller.removePowerPlant(player, number, parsed.get()));
     }
 
+    public Variant<SerializedGameState, RequestError> buyHouses(final int playerId, final List<String> townNames) {
+        PlayerColor player = players.get(playerId);
+        if (player == null) {
+            return Variant.failure(new RequestError("Unknown player."));
+        }
+
+        if (townNames == null) {
+            return Variant.failure(new RequestError("Town list is missing."));
+        }
+
+        for (String townName : townNames) {
+            if (townName == null) {
+                return Variant.failure(new RequestError("Town name is missing."));
+            }
+        }
+
+        return createResponse(controller.buyHouses(player, List.copyOf(townNames)));
+    }
+
     private Optional<List<Resource>> parseResources(final String resources) {
         if (resources == null) {
             return Optional.empty();
