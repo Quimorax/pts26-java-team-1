@@ -1,6 +1,7 @@
 package sk.uniba.fmph.dcs.power_grid;
 import static org.junit.Assert.assertEquals;
 import java.util.Map;
+import java.util.List;
 import org.junit.Test;
 
 public class PowerGridGameAdapterTest {
@@ -182,6 +183,44 @@ public class PowerGridGameAdapterTest {
         assertEquals(Variant.failure(new RequestError("Unknown player.")), result);
         assertEquals(0, controller.callCount());
     }
+
+    @Test
+    public void convertsResourceCodesAndKeepsRepeatedResources() {
+        GameControllerStub controller = new GameControllerStub();
+        PowerGridGameAdapter adapter = new PowerGridGameAdapter(controller, Map.of(42, PlayerColor.GREEN));
+
+        Variant<SerializedGameState, RequestError> result = adapter.buyResources(42, "CCOGU");
+
+        assertEquals("buyResources", controller.lastAction());
+        assertEquals(PlayerColor.GREEN, controller.receivedPlayer());
+        assertEquals(List.of(Resource.COAL, Resource.COAL, Resource.OIL, Resource.GARBAGE, Resource.URANIUM), controller.receivedResources());
+        assertEquals(1, controller.callCount());
+        assertEquals(Variant.success(new SerializedGameState("test state")), result);
+    }
+
+    @Test
+    public void rejectsUnknownResourceWithoutCallingController() {
+        GameControllerStub controller = new GameControllerStub();
+        PowerGridGameAdapter adapter = new PowerGridGameAdapter(controller, Map.of(42, PlayerColor.GREEN));
+
+        Variant<SerializedGameState, RequestError> result = adapter.buyResources(42, "CX");
+
+        assertEquals(Variant.failure(new RequestError("Invalid resource string.")), result);
+        assertEquals(0, controller.callCount());
+    }
+
+    @Test
+    public void passesEmptyResourceListToController() {
+        GameControllerStub controller = new GameControllerStub();
+        PowerGridGameAdapter adapter = new PowerGridGameAdapter(controller, Map.of(42, PlayerColor.GREEN));
+
+        Variant<SerializedGameState, RequestError> result = adapter.buyResources(42, "");
+
+        assertEquals(List.of(), controller.receivedResources());
+        assertEquals(1, controller.callCount());
+        assertEquals(Variant.success(new SerializedGameState("test state")), result);
+    }
 }
+
 
 

@@ -2,6 +2,8 @@ package sk.uniba.fmph.dcs.power_grid;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
 
 public final class PowerGridGameAdapter {
     private final GameControllerPort controller;
@@ -61,6 +63,40 @@ public final class PowerGridGameAdapter {
         Optional<RequestError> error = controller.doNotBidForCurrentPowerPlant(player);
 
         return createResponse(error);
+    }
+
+    public Variant<SerializedGameState, RequestError> buyResources(final int playerId, final String resources) {
+        PlayerColor player = players.get(playerId);
+        if (player == null) {
+            return Variant.failure(new RequestError("Unknown player."));
+        }
+
+        Optional<List<Resource>> parsed = parseResources(resources);
+        if (parsed.isEmpty()) {
+            return Variant.failure(new RequestError("Invalid resource string."));
+        }
+
+        return createResponse(controller.buyResources(player, parsed.get()));
+    }
+
+    private Optional<List<Resource>> parseResources(final String resources) {
+        if (resources == null) {
+            return Optional.empty();
+        }
+
+        List<Resource> result = new ArrayList<>();
+        for (char code : resources.toCharArray()) {
+            switch (code) {
+                case 'C' -> result.add(Resource.COAL);
+                case 'O' -> result.add(Resource.OIL);
+                case 'G' -> result.add(Resource.GARBAGE);
+                case 'U' -> result.add(Resource.URANIUM);
+                default -> {
+                    return Optional.empty();
+                }
+            }
+        }
+        return Optional.of(result);
     }
 
     private Variant<SerializedGameState, RequestError> createResponse(final Optional<RequestError> error) {
