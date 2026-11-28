@@ -18,7 +18,6 @@ public class CheckAndBumpStepTest {
     private FakeTowns towns;
     private FakeMarket market;
     private ResourceMarket resourceMarket;
-    private ResourcePool pool;
     private List<String> eventLog;
 
     @Before
@@ -26,9 +25,8 @@ public class CheckAndBumpStepTest {
         eventLog = new ArrayList<>();
         towns = new FakeTowns(eventLog);
         market = new FakeMarket(eventLog);
-        pool = new ResourcePool();
         resourceMarket = new ResourceMarket(
-                pool,
+                new FakePool(),
                 List.of(),
                 Map.of(
                         1, Map.of(Resource.COAL, 1, Resource.OIL, 1, Resource.GARBAGE, 1, Resource.URANIUM, 1),
@@ -225,6 +223,27 @@ public class CheckAndBumpStepTest {
         @Override
         public void startStep3() {
             log.add("market:startStep3");
+        }
+    }
+
+    private static final class FakePool implements InterfaceResourcePoolResourceMarket {
+        @Override
+        public boolean canTakeResourcesFromStorageSpace(final List<Resource> resources) {
+            return false;
+        }
+
+        @Override
+        public void getFromStorageSpace(final List<Resource> resources) {
+        }
+
+        @Override
+        public List<Resource> takeResources(final List<Resource> resources) {
+            return List.of();
+        }
+
+        @Override
+        public String getStateString() {
+            return "{}";
         }
     }
 }
