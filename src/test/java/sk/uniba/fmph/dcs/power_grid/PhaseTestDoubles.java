@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-/** Small dependency fakes for the resource-buying and house-building phase tests. */
+/** Shared test boards, towns and market for the phases and controller. */
 final class PhaseTestDoubles {
     private PhaseTestDoubles() {
     }
@@ -19,7 +19,7 @@ final class PhaseTestDoubles {
         return players;
     }
 
-    static final class Board implements PlayerBoardPort {
+    static class Board implements PlayerBoardPort {
         int money = 50;
         int resourceCalls;
         int spendCalls;
@@ -87,7 +87,7 @@ final class PhaseTestDoubles {
         }
     }
 
-    static final class Towns implements TownsPort {
+    static class Towns implements TownsPort {
         final Map<PlayerColor, Integer> houses = new EnumMap<>(PlayerColor.class);
         int cost = 12;
         int buyCalls;
@@ -133,7 +133,7 @@ final class PhaseTestDoubles {
         }
     }
 
-    static final class Market implements PowerPlantMarketPort {
+    static class Market implements PowerPlantMarketPort {
         final List<Integer> cleanupLimits = new ArrayList<>();
 
         @Override
